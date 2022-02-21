@@ -1,0 +1,35 @@
+package  com.isuperone.lining.common.enumration;
+public enum StatusEnums {
+
+    appointmentItemUseStatus_disable(-1,"未使用"),
+    appointmentItemUseStatus_enable(1,"使用中");
+
+    private int code;
+    private String message;
+
+    private StatusEnums() {
+        this.code = this.name().hashCode();
+        this.message = this.name().toString();
+    }
+
+    private StatusEnums(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}

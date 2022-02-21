@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.isuperone.lining.mapper.biz.BizProjectMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.isuperone.lining.model.entity.biz.BizProject">
+    <result column="id" property="id" />
+        <result column="projectName" property="projectName" />
+        <result column="address" property="address" />
+        <result column="enterpriseId" property="enterpriseId" />
+        <result column="projectContractor" property="projectContractor" />
+        <result column="phone" property="phone" />
+        <result column="startDate" property="startDate" />
+        <result column="endDate" property="endDate" />
+        <result column="createTime" property="createTime" />
+    </resultMap>
+
+    <select id="findProjectPage" resultType="com.isuperone.lining.model.vo.project.BizProjectVO">
+        SELECT
+        *
+        FROM
+        biz_project a
+        LEFT JOIN biz_enterprise b ON a.enterpriseId = b.id
+        <where>
+            <if test="project.projectName!=null and project.projectName!=''">
+                and a.projectName like concat('%',#{project.projectName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="project.enterpriseId!=null and project.enterpriseId!=''">
+                and a.enterpriseId = #{project.enterpriseId}
+            </if>
+            <if test="project.projectContractor!=null and project.projectContractor!=''">
+                and a.projectContractor like concat('%',#{project.projectContractor,jdbcType=VARCHAR},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getProjectInfo" resultType="com.isuperone.lining.model.vo.project.BizProjectVO">
+		SELECT
+        *
+        FROM
+        biz_project a
+        INNER JOIN biz_enterprise b ON a.enterpriseId = b.id
+        WHERE
+	        a.id = #{project.id}
+	</select>
+
+    <select id="getProjectNum" resultType="Integer">
+        SELECT
+          count(distinct(a.id))
+        FROM
+          biz_project a
+        LEFT JOIN biz_supervision_section b ON b.projectId = a.id
+        LEFT JOIN biz_construction_section c ON c.supervisionSection = b.id
+        <where>
+            <if test="condition.projectEnterpriseId != null">
+                and a.enterpriseId = #{condition.projectEnterpriseId}
+            </if>
+            <if test="condition.supervisionEnterpriseId != null">
+                and b.enterpriseId = #{condition.supervisionEnterpriseId}
+            </if>
+            <if test="condition.constructionEnterpriseId != null">
+                and c.enterpriseId = #{condition.constructionEnterpriseId}
+            </if>
+        </where>
+	</select>
+
+    <select id="findBizProjectList" resultType="com.isuperone.lining.model.entity.biz.BizProject">
+        SELECT
+        a.*
+        FROM
+        biz_project a
+        LEFT JOIN biz_supervision_section b ON a.id = b.projectId
+        LEFT JOIN biz_construction_section c ON b.id = c.supervisionSection
+        <where>
+            <if test="condition.projectEnterpriseId != null">
+                and a.enterpriseId = #{condition.projectEnterpriseId}
+            </if>
+            <if test="condition.supervisionEnterpriseId != null">
+                and b.enterpriseId = #{condition.supervisionEnterpriseId}
+            </if>
+            <if test="condition.constructionEnterpriseId != null">
+                and c.enterpriseId = #{condition.constructionEnterpriseId}
+            </if>
+            <if test="project.projectName!=null and project.projectName!=''">
+                and a.projectName like concat('%',#{project.projectName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="project.enterpriseId!=null and project.enterpriseId!=''">
+                and a.enterpriseId = #{project.enterpriseId}
+            </if>
+            <if test="project.projectContractor!=null and project.projectContractor!=''">
+                and a.projectContractor like concat('%',#{project.projectContractor,jdbcType=VARCHAR},'%')
+            </if>
+        </where>
+        GROUP BY a.id
+    </select>
+
+
+</mapper>

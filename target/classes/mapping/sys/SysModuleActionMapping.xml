@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.isuperone.lining.mapper.sys.SysModuleActionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.isuperone.lining.model.entity.sys.SysModuleAction">
+        <result column="id" property="id" />
+        <result column="moduleId" property="moduleId" />
+        <result column="action" property="action" />
+        <result column="description" property="description" />
+        <result column="defaultCheck" property="defaultCheck" />
+        <result column="createTime" property="createTime" />
+    </resultMap>
+
+
+    <select id="findModuleActionPage"  resultType="com.isuperone.lining.model.dto.system.SysModuleActionDto">
+        SELECT
+        *
+        FROM
+        sys_module a
+        WHERE
+        status != - 1
+        <if test="sysModule.menu !=null ">
+            and a.isMenu = #{sysModule.menu}
+        </if>
+        ORDER BY
+        parentId,
+        sort
+    </select>
+
+    <select id="findModuleActionList"  resultType="com.isuperone.lining.model.dto.system.SysModuleActionDto">
+        SELECT
+        *
+        FROM
+        sys_module a
+        <where>
+            <if test="sysModule.parentId !=null ">
+                and a.parentId = #{sysModule.parentId}
+            </if>
+            and a.status != -1
+        </where>
+        ORDER BY
+        parentId,
+        sort
+    </select>
+
+</mapper>

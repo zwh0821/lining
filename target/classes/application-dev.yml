@@ -1,0 +1,46 @@
+server:
+  port: 8088
+  address: 0.0.0.0
+spring:
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/iotdb?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8
+    driver-class-name: com.mysql.jdbc.Driver
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  main:
+    allow-bean-definition-overriding: true
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+#mybatis:
+mybatis-plus:
+  mapper-locations: classpath:/mapping/**/*Mapping.xml
+  type-aliases-package: com.isuperone.lining.model.entity
+  configuration:
+    # 是否开启自动驼峰命名规则（camel case）映射，即从经典数据库列名 A_COLUMN（下划线命名） 到经典 Java 属性名 aColumn（驼峰命名） 的类似映射
+    map-underscore-to-camel-case: false
+  global-config:
+    db-column-underline: false
+    db-config:
+      logic-delete-field: status  #全局逻辑删除字段值
+      logic-delete-value: -1 #逻辑已删除值（默认为1）
+      logic-not-delete-value: 1 #逻辑未删除值（默认为0）
+
+logging:
+  level:
+    com.isuperone.lining.mapper.biz : debug
+    com.isuperone.lining.mapper.sys : debug
+
+# 上传文件相关
+file:
+  # 文件上传目录
+  #uploadFolder: /usr/local/upload
+  uploadFolder: D://uploadFiles/
+  # 对外访问的资源路径
+  staticAccessPath: /api/uploadFiles/
+  baseUrl: http://192.168.50.251:8088

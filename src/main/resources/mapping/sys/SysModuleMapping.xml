@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.isuperone.lining.mapper.sys.SysModuleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.isuperone.lining.model.entity.sys.SysModule">
+        <result column="id" property="id" />
+        <result column="parentId" property="parentId" />
+        <result column="grade" property="grade" />
+        <result column="icon" property="icon" />
+        <result column="url" property="url" />
+        <result column="moduleName" property="moduleName" />
+        <result column="menu" property="isMenu" />
+        <result column="description" property="description" />
+        <result column="sort" property="sort" />
+        <result column="status" property="status" />
+        <result column="createTime" property="createTime"/>
+    </resultMap>
+
+    <!-- 菜单信息查询映射结果 -->
+    <resultMap id="MenuResultMap" type="com.isuperone.lining.model.vo.SysModuleVO">
+        <result column="id" property="id" />
+        <result column="parentId" property="parentId" />
+        <result column="parentName" property="parentName" />
+        <result column="grade" property="grade" />
+        <result column="icon" property="icon" />
+        <result column="url" property="url" />
+        <result column="moduleName" property="moduleName" />
+        <result column="menu" property="isMenu" />
+        <result column="description" property="description" />
+        <result column="sort" property="sort" />
+        <result column="status" property="status" />
+        <result column="createTime" property="createTime"/>
+    </resultMap>
+
+    <select id="findMenuPage"  resultType="com.isuperone.lining.model.vo.SysModuleVO">
+      SELECT
+            a.*, b.moduleName AS parentName
+        FROM
+            (
+                SELECT
+                    *
+                FROM
+                    sys_module
+                WHERE
+                    isMenu = TRUE
+                AND
+                    status = 1
+            ) AS a
+        INNER JOIN (
+            SELECT
+                *
+            FROM
+                sys_module
+            WHERE
+                isMenu = FALSE
+            AND
+                status = 1
+        ) AS b ON a.parentId = b.id
+        order  by a.parentId,a.sort
+    </select>
+
+    <select id="getMenu"  resultType="com.isuperone.lining.model.vo.SysModuleVO">
+        SELECT
+            a.*,
+            b.moduleName as parentName
+        FROM
+            (
+                SELECT
+                    *
+                FROM
+                    sys_module
+                WHERE
+                    isMenu = TRUE
+                AND id = #{module.id}
+            ) AS a
+        INNER JOIN (
+            SELECT
+                id,
+                moduleName
+            FROM
+                sys_module
+            WHERE
+                isMenu = FALSE
+        ) AS b ON a.parentId = b.id
+    </select>
+
+</mapper>

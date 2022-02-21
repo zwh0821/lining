@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.isuperone.lining.mapper.biz.BizTaskMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.isuperone.lining.model.entity.biz.BizTask">
+        <result column="id" property="id"/>
+        <result column="constructionPoint" property="constructionPoint"/>
+        <result column="name" property="name"/>
+        <result column="constructionLength" property="constructionLength"/>
+        <result column="level" property="level"/>
+        <result column="constructorId" property="constructorId"/>
+        <result column="qualityInspector" property="qualityInspector"/>
+        <result column="supervisor" property="supervisor"/>
+        <result column="status" property="status"/>
+        <result column="createTime" property="createTime"/>
+    </resultMap>
+
+    <select id="findBizTaskPage" resultType="com.isuperone.lining.model.vo.task.BizTaskVO">
+      select
+            a.*, b.`name` AS constructionPointName,
+            c.sectionName AS constructionSectionName,
+            d.sectionName AS supervisionSectionName,
+            e.`name` AS constructorName,
+            f.`name` AS supervisorName,
+            g.`name` AS qualityInspectorName,
+            h.enterpriseName AS ownerEnterpriseName,
+            i.enterpriseName AS supervisionSectionEnterpriseName,
+            j.enterpriseName AS constructionSectionEnterpriseName,
+            k.projectName AS projectName
+        FROM
+            biz_task a
+        LEFT JOIN biz_construction_point b ON b.id = a.constructionPoint
+        LEFT JOIN biz_construction_section c ON c.id = a.constructionSection
+        LEFT JOIN biz_supervision_section d ON d.id = a.supervisorSection
+        LEFT JOIN biz_enterprisestaff e ON a.constructorId = e.id
+        LEFT JOIN biz_enterprisestaff f ON a.supervisor = f.id
+        LEFT JOIN biz_enterprisestaff g ON a.qualityInspector = g.id
+        LEFT JOIN biz_enterprise h on a.ownerEnterprise = h.id
+        LEFT JOIN biz_enterprise i on a.supervisorEnterprise = i.id
+        LEFT JOIN biz_enterprise j on a.constructionEnterprise = j.id
+        LEFT JOIN biz_project k on a.projectId = k.id
+        <where>
+            <if test="task.projectId !=null and task.projectId != '' ">
+                and a.projectId = #{task.projectId}
+            </if>
+            <if test="task.supervisorSection != null and task.supervisorSection != '' ">
+                and a.supervisorSection = #{task.supervisorSection}
+            </if>
+            <if test="task.constructionSection != null and task.constructionSection != '' ">
+                and a.constructionSection = #{task.constructionSection}
+            </if>
+            <if test="task.constructionPoint != null and task.constructionPoint != ''">
+                and a.constructionPoint = #{task.constructionPoint}
+            </if>
+            <if test="task.status != null">
+                and a.status = #{task.status}
+            </if>
+            <if test="map.statusFilter != null and map.statusFilter.size() > 0">
+                and a.status in
+                <foreach item="item" index="index" collection="map.statusFilter" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="map.startDate != null and map.startDate != '' ">
+                and a.createTime &gt;= #{map.startDate}
+            </if>
+            <if test="map.endDate != null and map.endDate != '' ">
+                and a.createTime &lt;= #{map.endDate}
+            </if>
+            <if test="task.ownerEnterprise != null and task.ownerEnterprise != '' ">
+                and a.ownerEnterprise = #{task.ownerEnterprise}
+            </if>
+            <if test="task.supervisorEnterprise != null and task.supervisorEnterprise != '' ">
+                and a.supervisorEnterprise = #{task.supervisorEnterprise}
+            </if>
+            <if test="task.constructionEnterprise != null and task.constructionEnterprise != '' ">
+                and a.constructionEnterprise = #{task.constructionEnterprise}
+            </if>
+            <if test="task.constructorId !=null and task.constructorId != '' ">
+                and a.constructorId = #{task.constructorId}
+            </if>
+            <if test="task.qualityInspector != null and task.qualityInspector != '' ">
+                and a.qualityInspector = #{task.qualityInspector}
+            </if>
+            <if test="task.supervisor != null and task.supervisor != '' ">
+                and a.supervisor = #{task.supervisor}
+            </if>
+        </where>
+    </select>
+
+    <select id="getBizTaskInfo" resultType="com.isuperone.lining.model.vo.task.BizTaskVO">
+	     SELECT
+            a.*, b.`name` AS constructionPointName,
+            c.sectionName AS constructionSectionName,
+            c.id AS constructionSectionId,
+            d.sectionName AS supervisionSectionName,
+            d.id AS supervisionSectionId,
+            e.`name` AS constructorName,
+            f.`name` AS supervisorName,
+            g.`name` AS qualityInspectorName,
+            h.enterpriseName AS constructionSectionEnterpriseName,
+            i.enterpriseName AS supervisionSectionEnterpriseName,
+            j.id AS projectId,
+            j.projectName AS projectName
+        FROM
+            biz_task a
+        LEFT JOIN biz_construction_point b ON a.constructionPoint = b.id
+        LEFT JOIN biz_construction_section c ON b.constructionSection = c.id
+        LEFT JOIN biz_supervision_section d ON c.supervisionSection = d.id
+        LEFT JOIN biz_enterprisestaff e ON a.constructorId = e.id
+        LEFT JOIN biz_enterprisestaff f ON a.supervisor = f.id
+        LEFT JOIN biz_enterprisestaff g ON a.qualityInspector = g.id
+        LEFT JOIN biz_enterprise h ON c.enterpriseId = h.id
+        LEFT JOIN biz_enterprise i ON d.enterpriseId = i.id
+        LEFT JOIN biz_project j ON d.projectId = j.id
+        WHERE
+            a.id = #{task.id}
+	</select>
+
+    <select id="findExcelList" resultType="com.isuperone.lining.model.vo.task.BizTaskVO">
+        SELECT
+        a.*, b.`name` AS constructionPointName,
+        c.sectionName AS constructionSectionName,
+        c.id AS constructionSectionId,
+        d.sectionName AS supervisionSectionName,
+        d.id AS supervisionSectionId,
+        e.`name` AS constructorName,
+        f.`name` AS supervisorName,
+        g.`name` AS qualityInspectorName,
+        h.enterpriseName AS constructionSectionEnterprise,
+        i.enterpriseName AS supervisionSectionEnterprise,
+        j.id AS projectId,
+        j.projectName AS projectName
+        FROM
+        biz_task a
+        LEFT JOIN biz_construction_point b ON a.constructionPoint = b.id
+        LEFT JOIN biz_construction_section c ON b.constructionSection = c.id
+        LEFT JOIN biz_supervision_section d ON c.supervisionSection = d.id
+        LEFT JOIN biz_enterprisestaff e ON a.constructorId = e.id
+        LEFT JOIN biz_enterprisestaff f ON a.supervisor = f.id
+        LEFT JOIN biz_enterprisestaff g ON a.qualityInspector = g.id
+        LEFT JOIN biz_enterprise h ON c.enterpriseId = h.id
+        LEFT JOIN biz_enterprise i ON d.enterpriseId = i.id
+        LEFT JOIN biz_project j ON d.projectId = j.id
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                and a.id in
+                <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getPropertySum" resultType="Integer">
+	     SELECT
+           count(1) as sum
+        FROM
+            biz_task a
+        <where>
+        <if test="task.constructorId !=null and task.constructorId != '' ">
+            and a.constructorId = #{task.constructorId}
+        </if>
+        <if test="task.qualityInspector !=null and task.qualityInspector != '' ">
+            and a.qualityInspector = #{task.qualityInspector}
+        </if>
+        <if test="task.supervisor !=null and task.supervisor != '' ">
+            and a.supervisor = #{task.supervisor}
+        </if>
+        <if test="property !=null and property != '' ">
+            group by #{property}
+        </if>
+        </where>
+	</select>
+
+    <select id="getTaskSumByProject" resultType="Integer">
+       SELECT
+            count(1) as sum
+        FROM
+            biz_task a
+        LEFT JOIN biz_construction_point b ON a.constructionPoint = b.id
+        LEFT JOIN biz_construction_section c ON b.constructionSection = c.id
+        LEFT JOIN biz_supervision_section d ON c.supervisionSection = d.id
+        LEFT JOIN biz_project e ON d.projectId = e.id
+        <where>
+            <if test="condition.projectEnterpriseId !=null ">
+                and e.enterpriseId = #{condition.projectEnterpriseId}
+            </if>
+            <if test="condition.supervisionEnterpriseId !=null ">
+                and d.enterpriseId = #{condition.supervisionEnterpriseId}
+            </if>
+            <if test="condition.constructionEnterpriseId !=null ">
+                and c.enterpriseId = #{condition.constructionEnterpriseId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getTaskProjectGroup" resultType="HashMap">
+        SELECT
+          COUNT(b.projectName) as sum,
+          b.projectName
+        FROM
+          biz_task a
+        LEFT JOIN biz_project b ON a.projectId = b.id
+        <where>
+            <if test="condition.projectEnterpriseId != null ">
+                and a.ownerEnterprise = #{condition.projectEnterpriseId}
+            </if>
+            <if test="condition.supervisionEnterpriseId != null ">
+                and a.supervisorEnterprise = #{condition.supervisionEnterpriseId}
+            </if>
+            <if test="condition.constructionEnterpriseId != null ">
+                and a.constructionEnterprise = #{condition.constructionEnterpriseId}
+            </if>
+            <if test="condition.constructorId != null ">
+                and a.constructorId = #{condition.constructorId}
+            </if>
+            <if test="condition.supervisor != null ">
+                and a.supervisor = #{condition.supervisor}
+            </if>
+            <if test="condition.qualityInspector != null ">
+                and a.qualityInspector = #{condition.qualityInspector}
+            </if>
+        </where>
+        GROUP BY b.projectName
+    </select>
+
+    <select id="getTaskMonGroup" resultType="HashMap">
+        SELECT
+        DATE_FORMAT(a.createTime, '%m') AS mon,
+        count(a.id) as sum
+        FROM
+        biz_task a
+        <where>
+            <if test="condition.projectEnterpriseId != null ">
+                and a.ownerEnterprise = #{condition.projectEnterpriseId}
+            </if>
+            <if test="condition.supervisionEnterpriseId != null ">
+                and a.supervisorEnterprise = #{condition.supervisionEnterpriseId}
+            </if>
+            <if test="condition.constructionEnterpriseId != null ">
+                and a.constructionEnterprise = #{condition.constructionEnterpriseId}
+            </if>
+            <if test="condition.constructorId != null ">
+                and a.constructorId = #{condition.constructorId}
+            </if>
+            <if test="condition.supervisor != null ">
+                and a.supervisor = #{condition.supervisor}
+            </if>
+            <if test="condition.qualityInspector != null ">
+                and a.qualityInspector = #{condition.qualityInspector}
+            </if>
+        </where>
+        group BY mon
+    </select>
+
+</mapper>

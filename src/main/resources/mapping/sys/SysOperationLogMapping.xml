@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.isuperone.lining.mapper.sys.SysOperationLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.isuperone.lining.model.entity.sys.SysOperationLog">
+    <result column="id" property="id" />
+        <result column="userId" property="userId" />
+        <result column="action" property="action" />
+        <result column="detail" property="detail" />
+        <result column="createTime" property="createTime" />
+    </resultMap>
+
+    <select id="findSysOperationLogPage" resultType="com.isuperone.lining.model.vo.sys.SysOperationLogVO">
+        SELECT
+        a.*, b.username AS operator
+        FROM
+        sys_operation_log a
+        LEFT JOIN sys_user b ON a.userId = b.id
+        <where>
+            1 = 1
+            <if test="log.type !=null ">
+                and a.type = #{log.type}
+            </if>
+            <if test="map.detail !=null and map.detail != '' ">
+                and a.detail like concat('%',#{map.detail,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="map.operator != null and map.operator != '' ">
+                and operator like concat('%',#{map.operator,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="map.startDate != null and map.startDate != '' ">
+                and a.createTime &gt;= #{map.startDate}
+            </if>
+            <if test="map.endDate != null and map.endDate != '' ">
+                and a.createTime &lt;= #{map.endDate}
+            </if>
+        </where>
+         order by a.createTime desc
+    </select>
+
+</mapper>

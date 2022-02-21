@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.isuperone.lining.mapper.sys.SysUserMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.isuperone.lining.model.entity.sys.SysUser">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="username" property="username" />
+		<result column="password" property="password" />
+		<result column="status" property="status" />
+		<result column="telephone" property="telephone" />
+		<result column="lastLoginIp" property="lastLoginIp" />
+		<result column="lastLoginTime" property="lastLoginTime" />
+		<result column="merchantCode" property="merchantCode" />
+		<result column="createTime" property="createTime" />
+	</resultMap>
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="UserResultMap" type="com.isuperone.lining.model.vo.SysUserVO">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="username" property="username" />
+		<result column="roleName" property="roleName" />
+		<result column="password" property="password" />
+		<result column="status" property="status" />
+		<result column="telephone" property="telephone" />
+		<result column="lastLoginIp" property="lastLoginIp" />
+		<result column="lastLoginTime" property="lastLoginTime" />
+		<result column="merchantCode" property="merchantCode" />
+		<result column="createTime" property="createTime" />
+	</resultMap>
+
+	<select id="findUserPage"  resultType="com.isuperone.lining.model.vo.SysUserVO">
+		SELECT
+			a.*, c.`name` AS roleName,b.roleId
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					sys_user
+				<where>
+					 STATUS != - 1
+					<if test="sysUser.name!=null and sysUser.name!=''">
+						and name like concat('%',#{sysUser.name,jdbcType=VARCHAR},'%')
+					</if>
+				</where>
+			) AS a
+		inner JOIN sys_user_role AS b ON a.id = b.userId
+		inner JOIN sys_role AS c ON b.roleId = c.id
+		<where>
+			<if test="sysUser.roleId!=null and sysUser.roleId!=''">
+				 b.roleId = #{sysUser.roleId}
+			</if>
+		</where>
+    </select>
+
+	<select id="getUserInfo"  resultType="com.isuperone.lining.model.vo.SysUserVO">
+		SELECT
+		a.*, c.`name` AS roleName ,b.roleId,
+		d.`name` as staffName
+		FROM
+		(
+		SELECT
+		*
+		FROM
+		sys_user
+		where id = #{sysUser.id}
+		) AS a
+		left JOIN sys_user_role AS b ON a.id = b.userId
+		left JOIN sys_role AS c ON b.roleId = c.id
+		LEFT JOIN biz_enterprisestaff d on d.id = a.staffId
+	</select>
+
+	<select id="getPositonInfo"  resultType="com.isuperone.lining.model.dto.basis.UserPositionInfoDto">
+		SELECT
+			a.`name`,
+			a.telephone,
+			b.position,
+			c.enterpriseName
+		FROM
+			sys_user a
+		LEFT JOIN biz_enterprisestaff b ON a.staffId = b.id
+		LEFT JOIN biz_enterprise c ON b.enterpriseId = c.id
+		where a.id = #{userId}
+	</select>
+</mapper>
